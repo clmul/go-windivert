@@ -1,3 +1,6 @@
+WinDivert64.sys
+WinDivert32.sys
+
 # Binaries for programs and plugins
 *.exe
 *.dll
