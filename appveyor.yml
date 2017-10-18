@@ -1,6 +1,6 @@
 version: "{build}"
 
-clone_folder: c:\gopath\src\github.com\clmul\divert
+clone_folder: c:\gopath\src\github.com\clmul\go-windivert
 
 environment:
   GOPATH: c:\gopath
