@@ -11,6 +11,44 @@ import (
 	"time"
 )
 
+func TestParam(t *testing.T) {
+	const (
+		// FIXME document says default WINDIVERT_PARAM_QUEUE_LEN is 512
+		DefaultQueueLen  = 1024
+		DefaultQueueTime = 512
+		// TODO document says this is supported in 1.3.0, but it isn't
+		DefaultQueueSize = 4 * 1024 * 1024
+	)
+	handle, err := Open("true", LayerNetwork, 0, 0)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer handle.Close()
+	assertParam := func(name string, param uintptr, value uint64) {
+		v, err := handle.GetParam(param)
+		if err != nil {
+			t.Errorf("fail to get param %v, err: %v", name, err)
+			return
+		}
+		if v != value {
+			t.Errorf("expect %v to be %v, but got %v", name, value, v)
+		}
+	}
+	setParam := func(name string, param uintptr, value uint64) {
+		err = handle.SetParam(param, value)
+		if err != nil {
+			t.Errorf("fail to set param %v, err: %v", name, err)
+		}
+	}
+	assertParam("QueueLen", ParamQueueLen, DefaultQueueLen)
+	setParam("QueueLen", ParamQueueLen, DefaultQueueLen * 2)
+	assertParam("QueueLen", ParamQueueLen, DefaultQueueLen * 2)
+
+	assertParam("QueueTime", ParamQueueTime, DefaultQueueTime)
+	setParam("QueueTime", ParamQueueTime, DefaultQueueTime * 2)
+	assertParam("QueueTime", ParamQueueTime, DefaultQueueTime * 2)
+}
+
 func TestRecv(t *testing.T) {
 	const (
 		n      = 19
