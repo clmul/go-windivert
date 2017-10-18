@@ -19,7 +19,7 @@ func main() {
 	if err == nil && err1 == nil {
 		return
 	}
-	url := "https://reqrypt.org/download/WinDivert-1.2.0-rc-MINGW.zip"
+	url := "https://reqrypt.org/download/WinDivert-1.3.0-MINGW.zip"
 	response, err := http.Get(url)
 	if err != nil || response.StatusCode != http.StatusOK {
 		log.Fatal("fail to download DLL")
