@@ -17,7 +17,7 @@ var close_ *windows.Proc
 var calcChecksums *windows.Proc
 
 const (
-	False              = 0
+	false_             = 0
 	InvalidHandleValue = -1
 
 	LayerNetwork        = 0
@@ -58,7 +58,7 @@ func Open(filter string, layer, priority, flags int) (Handle, error) {
 
 func (h Handle) Close() error {
 	r, _, err := close_.Call(uintptr(h))
-	if r == False {
+	if r == false_ {
 		return err
 	}
 	return nil
@@ -67,7 +67,7 @@ func (h Handle) Close() error {
 func (h Handle) Recv(packet []byte) (n int, addr Address, err error) {
 	r, _, err := recv.Call(uintptr(h), bytesToPtr(packet), uintptr(len(packet)),
 		uintptr(unsafe.Pointer(&addr)), uintptr(unsafe.Pointer(&n)))
-	if r == False {
+	if r == false_ {
 		return 0, addr, err
 	}
 	return n, addr, nil
@@ -76,7 +76,7 @@ func (h Handle) Recv(packet []byte) (n int, addr Address, err error) {
 func (h Handle) Send(packet []byte, addr Address) (n int, err error) {
 	r, _, err := send.Call(uintptr(h), bytesToPtr(packet), uintptr(len(packet)),
 		uintptr(unsafe.Pointer(&addr)), uintptr(unsafe.Pointer(&n)))
-	if r == False {
+	if r == false_ {
 		return 0, err
 	}
 	if len(packet) != n {
