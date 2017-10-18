@@ -47,7 +47,7 @@ func timeout(d time.Duration) {
 }
 func TestDivert(t *testing.T) {
 	t.Log("Hello, Divert")
-	handle, err := Open(fmt.Sprintf("outbound and ip.DstAddr = 127.0.0.8 and udp.PayloadLength = %v", length), WinDivertLayerNetwork, 0, 0)
+	handle, err := Open(fmt.Sprintf("outbound and ip.DstAddr = 127.0.0.8 and udp.PayloadLength = %v", length), LayerNetwork, 0, 0)
 	if err != nil {
 		t.Fatal(err)
 	}

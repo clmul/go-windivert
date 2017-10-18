@@ -20,14 +20,15 @@ const (
 	False              = 0
 	InvalidHandleValue = -1
 
-	WinDivertLayerNetwork        = 0
-	WinDivertLayerNetworkForward = 1
+	LayerNetwork        = 0
+	LayerNetworkForward = 1
 
-	WinDirvertFlagSniff = 1
-	WinDivertFlagDrop   = 2
+	FlagSniff = 1
+	FlagDrop  = 2
 
-	WinDivertDirectionOutbound = 0
-	WinDivertDirectionInbound  = 1
+	DirectionOutbound = 0
+	DirectionInbound  = 1
+
 )
 
 type address struct {
