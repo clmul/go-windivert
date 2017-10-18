@@ -58,7 +58,7 @@ func TestRecv(t *testing.T) {
 	packet := make([]byte, 2048)
 	var recvMsg []byte
 	for i := 0; i < n; i++ {
-		n, _, _, err := handle.Recv(packet)
+		n, _, err := handle.Recv(packet)
 		if err != nil {
 			t.Fatal(err)
 		}

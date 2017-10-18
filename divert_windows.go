@@ -31,10 +31,10 @@ const (
 
 )
 
-type address struct {
-	ifIdx     uint32 // Packet's interface index
-	subIfIdx  uint32 // Packet's sub-interface index
-	direction uint8  // Packet's direction
+type Address struct {
+	IfIdx     uint32 // Packet's interface index
+	SubIfIdx  uint32 // Packet's sub-interface index
+	Direction uint8  // Packet's direction
 }
 
 type Handle uintptr
@@ -63,34 +63,17 @@ func (h Handle) Close() error {
 	}
 	return nil
 }
-func (h Handle) Recv(packet []byte) (n int, ifidx uint32, direction uint8, err error) {
-	var addr address
+
+func (h Handle) Recv(packet []byte) (n int, addr Address, err error) {
 	r, _, err := recv.Call(uintptr(h), bytesToPtr(packet), uintptr(len(packet)),
 		uintptr(unsafe.Pointer(&addr)), uintptr(unsafe.Pointer(&n)))
 	if r == False {
-		return 0, 0, 0, err
+		return 0, addr, err
 	}
-	return n, addr.ifIdx, addr.direction, nil
+	return n, addr, nil
 }
-func (h Handle) SendOut(packet []byte) (int, error) {
-	var n int
-	var addr address
-	addr.direction = WinDivertDirectionOutbound
-	r, _, err := send.Call(uintptr(h), bytesToPtr(packet), uintptr(len(packet)),
-		uintptr(unsafe.Pointer(&addr)), uintptr(unsafe.Pointer(&n)))
-	if r == False {
-		return 0, err
-	}
-	if len(packet) != n {
-		return n, io.ErrShortWrite
-	}
-	return n, nil
-}
-func (h Handle) SendIn(packet []byte, ifidx uint32) (int, error) {
-	var n int
-	var addr address
-	addr.ifIdx = ifidx
-	addr.direction = WinDivertDirectionInbound
+
+func (h Handle) Send(packet []byte, addr Address) (n int, err error) {
 	r, _, err := send.Call(uintptr(h), bytesToPtr(packet), uintptr(len(packet)),
 		uintptr(unsafe.Pointer(&addr)), uintptr(unsafe.Pointer(&n)))
 	if r == False {
