@@ -41,11 +41,13 @@ func sendUDP() {
 func payload(packet []byte) []byte {
 	return packet[20+8:]
 }
+
 func timeout(d time.Duration) {
 	<-time.After(d)
 	log.Fatal("timeout")
 }
-func TestDivert(t *testing.T) {
+
+func TestRecv(t *testing.T) {
 	t.Log("Hello, Divert")
 	handle, err := Open(fmt.Sprintf("outbound and ip.DstAddr = 127.0.0.8 and udp.PayloadLength = %v", length), LayerNetwork, 0, 0)
 	if err != nil {
