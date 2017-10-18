@@ -13,7 +13,7 @@ var dll *windows.DLL
 var open *windows.Proc
 var recv *windows.Proc
 var send *windows.Proc
-var closee *windows.Proc
+var close_ *windows.Proc
 var calcChecksums *windows.Proc
 
 const (
@@ -43,7 +43,7 @@ func init() {
 	open = dll.MustFindProc("WinDivertOpen")
 	recv = dll.MustFindProc("WinDivertRecv")
 	send = dll.MustFindProc("WinDivertSend")
-	closee = dll.MustFindProc("WinDivertClose")
+	close_ = dll.MustFindProc("WinDivertClose")
 	calcChecksums = dll.MustFindProc("WinDivertHelperCalcChecksums")
 }
 
@@ -56,7 +56,7 @@ func Open(filter string, layer, priority, flags int) (Handle, error) {
 }
 
 func (h Handle) Close() error {
-	r, _, err := closee.Call(uintptr(h))
+	r, _, err := close_.Call(uintptr(h))
 	if r == False {
 		return err
 	}
