@@ -14,6 +14,9 @@ var open *windows.Proc
 var recv *windows.Proc
 var send *windows.Proc
 var close_ *windows.Proc
+var setParam *windows.Proc
+var getParam *windows.Proc
+
 var calcChecksums *windows.Proc
 
 const (
@@ -29,6 +32,9 @@ const (
 	DirectionOutbound = 0
 	DirectionInbound  = 1
 
+	ParamQueueLen  = 0
+	ParamQueueTime = 1
+	ParamQueueSize = 2
 )
 
 type Address struct {
@@ -45,6 +51,9 @@ func init() {
 	recv = dll.MustFindProc("WinDivertRecv")
 	send = dll.MustFindProc("WinDivertSend")
 	close_ = dll.MustFindProc("WinDivertClose")
+	setParam = dll.MustFindProc("WinDivertSetParam")
+	getParam = dll.MustFindProc("WinDivertGetParam")
+
 	calcChecksums = dll.MustFindProc("WinDivertHelperCalcChecksums")
 }
 
@@ -83,6 +92,23 @@ func (h Handle) Send(packet []byte, addr Address) (n int, err error) {
 		return n, io.ErrShortWrite
 	}
 	return n, nil
+}
+
+func (h Handle) SetParam(param uintptr, value uint64) error {
+	r, _, err := setParam.Call(uintptr(h), param, uintptr(value))
+	if r == false_ {
+		return err
+	}
+	return nil
+}
+
+func (h Handle) GetParam(param uintptr) (uint64, error) {
+	var value uint64
+	r, _, err := getParam.Call(uintptr(h), param, uintptr(unsafe.Pointer(&value)))
+	if r == false_ {
+		return 0, err
+	}
+	return value, nil
 }
 
 func CalcChecksums(packet []byte) []byte {
