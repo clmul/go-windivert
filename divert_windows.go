@@ -2,8 +2,6 @@ package windivert
 
 import (
 	"io"
-	"reflect"
-	"strings"
 	"unsafe"
 
 	"golang.org/x/sys/windows"
@@ -58,7 +56,9 @@ func init() {
 }
 
 func Open(filter string, layer, priority, flags int) (Handle, error) {
-	r, _, err := open.Call(stringToPtr(filter+"\x00"), uintptr(layer), uintptr(priority), uintptr(flags))
+	str := make([]byte, len(filter)+1)
+	copy(str, filter)
+	r, _, err := open.Call(uintptr(unsafe.Pointer(&str[0])), uintptr(layer), uintptr(priority), uintptr(flags))
 	if int(r) == InvalidHandleValue {
 		return 0, err
 	}
@@ -74,7 +74,7 @@ func (h Handle) Close() error {
 }
 
 func (h Handle) Recv(packet []byte) (n int, addr Address, err error) {
-	r, _, err := recv.Call(uintptr(h), bytesToPtr(packet), uintptr(len(packet)),
+	r, _, err := recv.Call(uintptr(h), uintptr(unsafe.Pointer(&packet[0])), uintptr(len(packet)),
 		uintptr(unsafe.Pointer(&addr)), uintptr(unsafe.Pointer(&n)))
 	if r == false_ {
 		return 0, addr, err
@@ -83,7 +83,7 @@ func (h Handle) Recv(packet []byte) (n int, addr Address, err error) {
 }
 
 func (h Handle) Send(packet []byte, addr Address) (n int, err error) {
-	r, _, err := send.Call(uintptr(h), bytesToPtr(packet), uintptr(len(packet)),
+	r, _, err := send.Call(uintptr(h), uintptr(unsafe.Pointer(&packet[0])), uintptr(len(packet)),
 		uintptr(unsafe.Pointer(&addr)), uintptr(unsafe.Pointer(&n)))
 	if r == false_ {
 		return 0, err
@@ -112,19 +112,6 @@ func (h Handle) GetParam(param uintptr) (uint64, error) {
 }
 
 func CalcChecksums(packet []byte) []byte {
-	calcChecksums.Call(bytesToPtr(packet), uintptr(len(packet)), 0)
+	calcChecksums.Call(uintptr(unsafe.Pointer(&packet[0])), uintptr(len(packet)), 0)
 	return packet
-}
-
-func bytesToPtr(buffer []byte) uintptr {
-	header := (*reflect.SliceHeader)(unsafe.Pointer(&buffer))
-	return uintptr(unsafe.Pointer(header.Data))
-}
-
-func stringToPtr(s string) uintptr {
-	if !strings.HasSuffix(s, "\x00") {
-		panic("str argument missing null terminator: " + s)
-	}
-	header := (*reflect.StringHeader)(unsafe.Pointer(&s))
-	return uintptr(unsafe.Pointer(header.Data))
 }
